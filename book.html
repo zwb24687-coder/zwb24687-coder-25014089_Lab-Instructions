@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Catalogue</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 40px;
+    }
+    main {
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      color: #222;
+    }
+    article {
+      background: #ffffff;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      margin: 0 0 10px;
+    }
+    p {
+      margin: 5px 0;
+      color: #444;
+    }
+    .error {
+      color: #b00020;
+      background: #ffecec;
+      padding: 15px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Book Catalogue</h1>
+    <section id="books"></section>
+  </main>
+
+  <script>
+    const embeddedXML = `<?xml version="1.0" encoding="UTF-8"?>
+<catalogue>
+  <book id="B001">
+    <title>The Great Adventure</title>
+    <author>James Carter</author>
+    <price>15.99</price>
+  </book>
+  <book id="B002">
+    <title>Learning Web Development</title>
+    <author>Anna Lee</author>
+    <price>29.50</price>
+  </book>
+  <book id="B003">
+    <title>Introduction to Data Science</title>
+    <author>David Miller</author>
+    <price>39.00</price>
+  </book>
+</catalogue>`;
+
+    async function loadBooks() {
+      const booksContainer = document.getElementById("books");
+
+      try {
+        let xmlText;
+
+        try {
+          const response = await fetch("book.xml");
+
+          if (!response.ok) {
+            throw new Error("Fetch error: " + response.status);
+          }
+
+          xmlText = await response.text();
+        } catch (fetchError) {
+          xmlText = embeddedXML;
+        }
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+        const parseError = xmlDoc.querySelector("parsererror");
+        if (parseError) {
+          throw new Error("XML parsing error");
+        }
+
+        const books = xmlDoc.getElementsByTagName("book");
+        booksContainer.innerHTML = "";
+
+        for (const book of books) {
+          const id = book.getAttribute("id") || "No ID";
+          const title = book.querySelector("title")?.textContent || "No title";
+          const author = book.querySelector("author")?.textContent || "No author";
+          const price = book.querySelector("price")?.textContent || "No price";
+
+          const article = document.createElement("article");
+
+          const titleHeading = document.createElement("h2");
+          titleHeading.textContent = title;
+
+          const idText = document.createElement("p");
+          idText.textContent = "Book ID: " + id;
+
+          const authorText = document.createElement("p");
+          authorText.textContent = "Author: " + author;
+
+          const priceText = document.createElement("p");
+          priceText.textContent = "Price: $" + price;
+
+          article.appendChild(titleHeading);
+          article.appendChild(idText);
+          article.appendChild(authorText);
+          article.appendChild(priceText);
+          booksContainer.appendChild(article);
+        }
+      } catch (error) {
+        console.error(error.message);
+
+        const errorText = document.createElement("p");
+        errorText.className = "error";
+        errorText.textContent = "Unable to load book data.";
+        booksContainer.appendChild(errorText);
+      }
+    }
+
+    loadBooks();
+  </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profiles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 40px;
+    }
+    main {
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      color: #222;
+    }
+    article {
+      background: #ffffff;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      margin: 0 0 10px;
+    }
+    dl {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      row-gap: 8px;
+      margin: 0;
+    }
+    dt {
+      font-weight: bold;
+      color: #333;
+    }
+    dd {
+      margin: 0;
+      color: #444;
+    }
+    .error {
+      color: #b00020;
+      background: #ffecec;
+      padding: 15px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>User Profiles</h1>
+    <section id="profiles"></section>
+  </main>
+
+  <script>
+    const embeddedJSON = JSON.stringify([
+      {
+        firstName: "John",
+        lastName: "Smith",
+        email: "john.smith@example.com",
+        dateOfBirth: "1998-04-12",
+        address: {
+          street: "25 Green Street",
+          city: "Boston",
+          state: "Massachusetts",
+          zipCode: "02108"
+        },
+        preferences: {
+          theme: "dark",
+          language: "English",
+          notifications: true,
+          subscription: true
+        }
+      },
+      {
+        firstName: "Maria",
+        lastName: "Garcia",
+        email: "maria.garcia@example.com",
+        dateOfBirth: "2000-09-25",
+        address: {
+          street: "18 Maple Avenue",
+          city: "Chicago",
+          state: "Illinois",
+          zipCode: "60601"
+        },
+        preferences: {
+          theme: "light",
+          language: "Spanish",
+          notifications: false,
+          subscription: true
+        }
+      },
+      {
+        firstName: "Alex",
+        lastName: "Chen",
+        email: "alex.chen@example.com",
+        dateOfBirth: "1995-12-03",
+        address: {
+          street: "77 Pine Road",
+          city: "San Francisco",
+          state: "California",
+          zipCode: "94103"
+        },
+        preferences: {
+          theme: "system",
+          language: "Chinese",
+          notifications: true,
+          subscription: false
+        }
+      }
+    ]);
+
+    async function loadUserProfiles() {
+      const profilesContainer = document.getElementById("profiles");
+
+      try {
+        let jsonText;
+
+        try {
+          const response = await fetch("userProfiles.json");
+
+          if (!response.ok) {
+            throw new Error("Fetch error: " + response.status);
+          }
+
+          jsonText = await response.text();
+        } catch (fetchError) {
+          jsonText = embeddedJSON;
+        }
+
+        const users = JSON.parse(jsonText);
+        profilesContainer.innerHTML = "";
+
+        users.forEach(user => {
+          const article = document.createElement("article");
+
+          const name = document.createElement("h2");
+          name.textContent = user.firstName + " " + user.lastName;
+          article.appendChild(name);
+
+          const details = document.createElement("dl");
+
+          const basicDetails = [
+            ["Email", user.email],
+            ["Date of Birth", user.dateOfBirth],
+            ["Street", user.address?.street],
+            ["City", user.address?.city],
+            ["State", user.address?.state],
+            ["Zip Code", user.address?.zipCode],
+            ["Theme", user.preferences?.theme],
+            ["Language", user.preferences?.language],
+            ["Notifications", user.preferences?.notifications],
+            ["Newsletter Subscription", user.preferences?.subscription]
+          ];
+
+          basicDetails.forEach(([label, value]) => {
+            const term = document.createElement("dt");
+            term.textContent = label;
+
+            const description = document.createElement("dd");
+            description.textContent = value;
+
+            details.appendChild(term);
+            details.appendChild(description);
+          });
+
+          article.appendChild(details);
+          profilesContainer.appendChild(article);
+        });
+      } catch (error) {
+        console.error(error.message);
+
+        const errorText = document.createElement("p");
+        errorText.className = "error";
+        errorText.textContent = "Unable to load user profile data.";
+        profilesContainer.appendChild(errorText);
+      }
+    }
+
+    loadUserProfiles();
+  </script>
+</body>
+</html>

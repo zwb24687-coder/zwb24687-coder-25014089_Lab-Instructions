@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue>
+  <book id="B001">
+    <title>The Great Adventure</title>
+    <author>James Carter</author>
+    <price>15.99</price>
+  </book>
+  <book id="B002">
+    <title>Learning Web Development</title>
+    <author>Anna Lee</author>
+    <price>29.50</price>
+  </book>
+  <book id="B003">
+    <title>Introduction to Data Science</title>
+    <author>David Miller</author>
+    <price>39.00</price>
+  </book>
+</catalogue>
